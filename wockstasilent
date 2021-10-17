@@ -1,0 +1,278 @@
+repeat wait() until game:IsLoaded()
+
+pcall(function()
+    --// DONT CHANGE / DELETE THIS IT WILL BREAK
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/wocksta11/aimlock-script/main/script"))()
+end)
+
+if game.PlaceId == 2788229376 then
+    
+CreateWindow("Wocksta🩸 - Made this aimlock script")
+CreateMenu("Aimlock")
+
+CreateNote("Keybinds || Q To Lock / Un-Lock", "Aimlock")
+
+function GetFov(P0, P1, deg)
+    local X1, Y1, Z1 = P0:ToOrientation()
+    local Frame = CFrame.new(P0.p, P1.p)
+    local X2, Y2, Z2 = Frame:ToOrientation()
+    local Degree = math.deg
+    if deg then
+        return Vector3.new(Degree(X1-X2), Degree(Y1-Y2), Degree(Z1, Z2))
+        else
+        return Vector3.new((X1-X2), (Y1-Y2), (Z1- Z2))
+    end
+end
+
+function CheckArea(Part)
+    local CheckingZone = GetFov(game:GetService("Workspace").CurrentCamera.CFrame, Part.CFrame)
+    local Angle = math.abs(CheckingZone.X) + math.abs(CheckingZone.Y)
+    return Angle
+end
+
+_G.PredictionX = 0.0165
+_G.PredictionY = 0.0065
+Toggle = false
+
+_G.AimLock = false
+_G.AntiLag2 = false
+_G.AntiBreak1 = false
+_G.AimLockToggle = false
+CreateTogButton("Aim Lock", "Aimlock", (_G.AimLock), function()
+    if _G.AimLock == true then
+        _G.AimLock = false
+        else
+        _G.AimLock = true
+    end
+    
+    if _G.AimLock == true then
+        
+        if _G.AntiLag2 == false then
+            _G.AntiLag2 = true
+            game:GetService("Players").LocalPlayer:GetMouse().KeyDown:Connect(function(Key)
+                if Key ~= "q" then return end
+                if Key == "q" then
+                    if Toggle == true then
+                    if _G.Outlines == true then
+                        for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+                            if v.Character == AimLockTarget.Parent then
+                                AimLockTarget:FindFirstChildOfClass("SelectionBox"):Destroy()
+                            end
+                        end
+                    end
+                    _G.AimLock = false
+                    Toggle = false
+                    AimLockTarget = nil
+                    else
+                        AimLockTarget = nil
+                        MaxAngle = math.rad(15)
+                            for i, v in pairs(game:GetService("Players"):GetChildren()) do
+                                if v.Name ~= game:GetService("Players").LocalPlayer.Name and v.Character and v.Character.Head and v.Character.Humanoid and v.Character.Humanoid.Health > 1 then
+                                    local Check = CheckArea(v.Character.Head)
+                                        if Check < MaxAngle then
+                                           MaxAngle = Check
+                                            if _G.Head == false and _G.Torso == false and _G.Legs == false then
+                                                _G.Head = true 
+                                            end
+                                            if _G.Head == true then
+                                                AimLockTarget = v.Character.Head
+                                                if _G.Notifications == true then
+                                                    CreateNotification("Arctic Aimlock : Target Set To "..AimLockTarget.Parent.Name) 
+                                                end
+                                                if _G.Outlines == true then
+                                                    Outline = Instance.new("SelectionBox", AimLockTarget)
+                                                    Outline.Adornee = AimLockTarget
+                                                    Outline.Color3 = Color3.fromRGB(0, 50, 255)
+                                                end
+                                            elseif _G.Torso == true then
+                                                AimLockTarget = v.Character.UpperTorso
+                                                if _G.Notifications == true then
+                                                    CreateNotification("Arctic Aimlock : Target Set To "..AimLockTarget.Parent.Name) 
+                                                end
+                                                if _G.Outlines == true then
+                                                    Outline = Instance.new("SelectionBox", AimLockTarget)
+                                                    Outline.Adornee = AimLockTarget
+                                                    Outline.Color3 = Color3.fromRGB(0, 50, 255)
+                                                end
+                                            elseif _G.Legs == true then
+                                                AimLockTarget = v.Character.LowerTorso
+                                                if _G.Notifications == true then
+                                                    CreateNotification("Arctic Aimlock : Target Set To "..AimLockTarget.Parent.Name) 
+                                                end
+                                                if _G.Outlines == true then
+                                                    Outline = Instance.new("SelectionBox", AimLockTarget)
+                                                    Outline.Adornee = AimLockTarget
+                                                    Outline.Color3 = Color3.fromRGB(0, 50, 255)
+                                                end
+                                            else
+                                                AimLockTarget = v.Character.Head
+                                                if _G.Notifications == true then
+                                                    CreateNotification("Arctic Aimlock : Target Set To "..AimLockTarget.Parent.Name) 
+                                                end
+                                                if _G.Outlines == true then
+                                                    Outline = Instance.new("SelectionBox", AimLockTarget)
+                                                    Outline.Adornee = AimLockTarget
+                                                    Outline.Color3 = Color3.fromRGB(0, 50, 255)
+                                                end
+                                            end
+                                            _G.AimLock = true
+                                            Toggle = true
+                            end
+                        end
+                        end
+                    end
+                end
+            end)
+        end
+        
+        if _G.AntiBreak1 == false then
+        _G.AntiBreak1 = true
+        game:GetService("RunService").Heartbeat:Connect(function()
+            if _G.CameraMode == true then
+                pcall(function()
+                    game:GetService("Workspace").CurrentCamera.CFrame = CFrame.new(game:GetService("Workspace").CurrentCamera.CFrame.Position, AimLockTarget.Position + (AimLockTarget.Velocity * Vector3.new(_G.PredictionX, _G.PredictionY, _G.PredictionX)))
+                end)
+            end
+        end)
+        end
+    end
+end)
+
+_G.CameraMode = false
+CreateTogButton("Camera Mode", "Aimlock", (_G.CameraMode), function()
+    if _G.CameraMode == true then
+        _G.CameraMode = false
+        else
+        _G.CameraMode = true
+        if _G.SilentMode == true then
+            _G.SilentMode = false 
+        end
+    end
+end)
+
+CreateValueButton("Set Prediction", "Aimlock", "Prediction Value", function(Value)
+    if Value ~= nil then
+        _G.PredictionX = Value / 500
+        _G.PredictionY = Value / 1200
+        
+        CreateNotification("Prediction Set [ "..tostring(Value).." ]", 5)
+        else
+            CreateNotification("Please Set A Value.", 5)
+    end
+end)
+
+_G.AutoPilot = false
+CreateTogButton("Auto Prediction Settings", "Aimlock", (_G.AutoPilot), function()
+    if _G.AutoPilot == true then
+        _G.AutoPilot = false
+        else
+        _G.AutoPilot = true
+    end
+    
+    while _G.AutoPilot == true and game:GetService("RunService").Heartbeat:Wait() do
+        local PingString = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString()
+        local Split = string.split(PingString, " ")
+        local Ping = Split[1]
+        _G.PredictionX = tonumber(Ping) / 500
+        _G.PredictionY = tonumber(Ping) / 1200
+    end
+end)
+
+_G.Notifications = false
+CreateTogButton("Notifications", "Aimlock", (_G.Notifications), function()
+    if _G.Notifications == true then
+        _G.Notifications = false
+        else
+        _G.Notifications = true
+    end
+end)
+
+_G.Outlines = false
+CreateTogButton("Outlines", "Aimlock", (_G.Outlines), function()
+    if _G.Outlines == true then
+        _G.Outlines = false
+        else
+        _G.Outlines = true
+    end
+end)
+
+CreateDropDown("Aimlock", "Target Part")
+
+_G.Head = false
+_G.Torso = false
+_G.Legs = false
+
+CreateDropOption("Head", "Aimlock", "Target Part", function()
+    if _G.Head == true then
+        _G.Head = false
+        else
+        _G.Head = true
+        _G.Torso = false
+        _G.Legs = false
+        
+        CreateNotification("Target Set To Head", 5)
+    end
+end)
+
+CreateDropOption("Torso", "Aimlock", "Target Part", function()
+    if _G.Torso == true then
+        _G.Torso = false
+        else
+        _G.Head = false
+        _G.Torso = true
+        _G.Legs = false
+        
+        CreateNotification("Target Set To Torso", 5)
+    end
+end)
+
+CreateDropOption("Legs", "Aimlock", "Target Part", function()
+    if _G.Legs == true then
+        _G.Legs = false
+        else
+        _G.Head = false
+        _G.Torso = false
+        _G.Legs = true
+        
+        CreateNotification("Target Set To Legs", 5)
+    end
+end)
+
+_G.FakeLag = false
+CreateTogButton("Fake Lag", "Aimlock", (_G.FakeLag), function()
+    if _G.FakeLag == true then
+        _G.FakeLag = false
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Anchored = false
+        else
+        _G.FakeLag = true
+    end
+    
+    while _G.FakeLag == true do
+        pcall(function()
+            game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Anchored = true
+            wait(0.01)
+            game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Anchored = false
+            wait(0.01)
+        end)
+    end
+end)
+
+CreateColorPicker("Settings")
+    else
+    game:GetService("StarterGui"):SetCore("SendNotification", {	Title = "Arctic";	Text = "Only Game WockstaHub supports is : Da Hood";	Duration = 15;})
+    local Sound = Instance.new("Sound", game:GetService("Workspace"))
+	Sound.SoundId = "rbxassetid://5035412139"
+	Sound:Play()
+    spawn(function()
+        wait(2)
+        Sound:Destroy()
+    end)
+end
+    game:GetService("StarterGui"):SetCore("SendNotification", {	Title = "Arctic";	Text = "You Must Be In The Roblox Group : https://www.roblox.com/groups/12243982/ArcticGG#!/about";	Duration = 15;})
+    local Sound = Instance.new("Sound", game:GetService("Workspace"))
+	Sound.SoundId = "rbxassetid://5035412139"
+	Sound:Play()
+    spawn(function()
+        wait(2)
+        Sound:Destroy()
+    end)
